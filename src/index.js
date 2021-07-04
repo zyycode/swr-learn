@@ -49,7 +49,9 @@ function useSWR(...args) {
     config = args[2];
   }
 
-  // 内部使用的 key
+  // 假定 key 作为请求的标志符
+  // key 可以改变但是 fn 不能
+  // key 作为 revalidate 函数的依赖
   let key;
   if (typeof _key === 'function') {
     try {
@@ -62,7 +64,6 @@ function useSWR(...args) {
   // 配置对象
   config = Object.assign({}, defaultConfig, config);
 
-  // 定义内部使用状态
   // state: get from cache
   const [data, setData] = useState(useHydration() ? undefined : cacheGet(key));
   const [error, setError] = useState();
@@ -84,10 +85,44 @@ function useSWR(...args) {
 
   const forceRevalidate = useCallback(() => revalidate({ noDedupe: true })[revalidate]);
 
-  // 处理逻辑
   useLayoutEffect(() => {
+    if (!key) return undefined;
+
+    // 当 key 更新后，需要标记为 mounted
+    unmountedRef.current = false;
+
+    // 从缓存中获取数据
+    const _newData = cacheGet(key);
+
+    // 如果缓存数据或 key 发生变化，则更新 state
+    if ((_newData && deepEqual(data, _newData)) || keyRef.current !== key) {
+      setData(_newData);
+      dataRef.current = data;
+      keyRef.current = key;
+    }
+
+    // mounted 之后执行 revalidate 函数
+    if (_newData && window['requestIdleCallback']) {
+      // 如果有缓存则延迟执行 revalidate
+      // 不阻塞渲染
+      window['requestIdleCallback'](revalidate);
+    } else {
+      revalidate();
+    }
+
+    // 如果窗口聚焦，执行 revalidate
+    // throttle: 节流函数，毕竟多次调用，标签页频繁切换
+    const onFocus = throttle(revalidate, config.focusThrottleInterval);
+
+    // 轮询
+
     // 卸载操作
-    return () => {};
+    return () => {
+      // 清除
+      setData = () => null;
+      setError = () => null;
+      setIsValidating = () => null;
+    };
   }, [key]);
 
   return {
