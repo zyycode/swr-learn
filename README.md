@@ -14,7 +14,7 @@ Note for reading swr source code
 
 ## 错误处理
 
-## 请求出重（dedupe）
+## 请求去重（dedupe）
 
 ## 请求依赖（dependent fetching）
 
