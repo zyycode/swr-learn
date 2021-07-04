@@ -1,0 +1,13 @@
+{
+  "name": "swr-learn",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zyycode/swr-learn.git",
+  "author": "zyy <zhangyycoder@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "deep-equal": "^2.0.5",
+    "lodash": "^4.17.21",
+    "react": "^17.0.2"
+  }
+}
