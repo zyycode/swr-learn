@@ -79,7 +79,7 @@ function useSWR(...args) {
     }
   }
 
-  // 配置对象
+  // 合并配置对象
   config = Object.assign({}, defaultConfig, config);
 
   // useSWR自定义 rerender 部分
@@ -141,7 +141,7 @@ function useSWR(...args) {
             config.onSuccess(newData, key, config);
           }
 
-          // 请求结果和本地更新优先级
+          // 判断请求时间和 mutate 调用时间
           if (MUTATION_TS[key] && ts <= MUTATION_TS[key]) {
             setIsValidating(false);
             return false;
@@ -194,7 +194,7 @@ function useSWR(...args) {
       [key]
     );
 
-  const forceRevalidate = useCallback(() => revalidate({ noDedupe: true })[revalidate]);
+  const forceRevalidate = useCallback(() => revalidate({ noDedupe: true }), [revalidate]);
 
   useLayoutEffect(() => {
     if (!key) return undefined;
@@ -205,6 +205,7 @@ function useSWR(...args) {
     // 从缓存中获取数据
     const _newData = cacheGet(key);
 
+    // 处理数据更新
     // 如果缓存数据或 key 发生变化，则更新 state
     if ((_newData && deepEqual(data, _newData)) || keyRef.current !== key) {
       setData(_newData);
@@ -213,6 +214,7 @@ function useSWR(...args) {
     }
 
     // （自动）发起数据更新
+    // 在前浏览器处于空闲状态的时候执相对较低的任务
     // mounted 之后执行 revalidate 函数
     if (_newData && window['requestIdleCallback']) {
       // 如果有缓存则延迟执行 revalidate

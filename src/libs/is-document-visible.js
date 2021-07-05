@@ -1,3 +1,4 @@
+// 判断窗口是否可见
 function isDocumentVisible() {
   if (typeof document.visibilityState !== 'undefined') {
     return document.visibilityState === 'visible' || document.visibilityState === 'prerender';
