@@ -37,6 +37,8 @@ function onErrorRetry(
   }
 
   // exponential backoff
+  // ~~ 对于浮点数，替代 parseInt
+  // 1 << count 指 2 ^ count
   const count = Math.min(opts.retryCount || 0, 8)
   const timeout =
     ~~((Math.random() + 0.5) * (1 << count)) * config.errorRetryInterval

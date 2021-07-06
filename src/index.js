@@ -226,7 +226,7 @@ function useSWR(...args) {
 
     // 处理窗口聚焦时重新取数
     // 如果窗口聚焦，执行 revalidate
-    // throttle: 节流函数，毕竟多次调用，标签页频繁切换
+    // throttle: 节流函数，避免多次调用，标签页频繁切换
     const onFocus = throttle(revalidate, config.focusThrottleInterval);
 
     if (config.revalidateOnFocus) {
