@@ -36,6 +36,8 @@ function onErrorRetry(
     return
   }
 
+  // 指数级退避算法
+  // https://cloud.google.com/memorystore/docs/redis/exponential-backoff?hl=zh-cn
   // exponential backoff
   // ~~ 对于浮点数，替代 parseInt
   // 1 << count 指 2 ^ count
